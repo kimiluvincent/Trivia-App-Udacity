@@ -3,7 +3,6 @@
 ## Setting up the Backend
 
 ### Install Dependencies
-## Confirm you have installed all dependencies
 
 1. **Python 3.7** - Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
 
