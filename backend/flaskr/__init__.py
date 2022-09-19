@@ -133,6 +133,37 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.
     """
 
+    @app.route("questions", methods=["POST"])
+    def create_question():
+        body = request.get_json()
+
+        new_question = body.get("question",None)
+        new_answer = body.get("answer", None)
+        new_category = body.get("new_category", None)
+        new_difficulty = body.get("new_difficulty", None)
+
+        try:
+            question = Question(question=new_question, answer=new_answer, category=new_category,
+            difficult = new_difficulty)
+            question.insert()
+            selection = Question.query.order_by(Question.id).all()
+            current_questions =paginate_questions(request, selection)
+            
+            return jsonify(
+                {
+                    "success":True,
+                    "created":Question.id,
+                    "books":current_questions,
+                    "Total_questions":len(Question.query.all()),
+
+                }
+            )
+        except:
+            abort(422)
+
+
+
+
     """
     @TODO:
     Create a POST endpoint to get questions based on a search term.
@@ -143,6 +174,22 @@ def create_app(test_config=None):
     only question that include that string within their question.
     Try using the word "title" to start.
     """
+    @app.route("/questions", methods=["POST"])
+    def create_question():
+        body  = request.get_json()
+        search =body.get("search", None)
+        selection = Question.query.order_by(Question.id).filter(Question.question.ilike("%{}%").fomart(search))
+        current_questions =paginate_questions(request, selection)
+
+        return jsonify(
+            {
+                "success":True,
+                "books":current_questions,
+                "total_questions":len(selection.all()),
+            }
+        )
+
+
 
     """
     @TODO:
