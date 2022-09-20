@@ -133,7 +133,7 @@ def create_app(test_config=None):
     of the questions list in the "List" tab.
     """
 
-    @app.route("questions", methods=["POST"])
+    @app.route("/questions", methods=["POST"])
     def create_question():
         body = request.get_json()
 
@@ -174,7 +174,7 @@ def create_app(test_config=None):
     only question that include that string within their question.
     Try using the word "title" to start.
     """
-    @app.route("/questions", methods=["POST"])
+    """    @app.route("/questions", methods=["POST"])
     def create_question():
         body  = request.get_json()
         search =body.get("search", None)
@@ -188,7 +188,7 @@ def create_app(test_config=None):
                 "total_questions":len(selection.all()),
             }
         )
-
+    """
 
 
     """
