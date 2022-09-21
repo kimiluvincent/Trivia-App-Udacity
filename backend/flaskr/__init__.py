@@ -1,5 +1,6 @@
 from crypt import methods
 import os
+from unicodedata import category
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -17,6 +18,7 @@ def paginate_questions(request, selection):
 
     questions = [question.format() for question in selection ]
     current_questions = questions[start:end]
+    return current_questions
 
 def create_app(test_config=None):
     # create and configure the app
@@ -174,21 +176,27 @@ def create_app(test_config=None):
     only question that include that string within their question.
     Try using the word "title" to start.
     """
-    """    @app.route("/questions", methods=["POST"])
-    def create_question():
+    @app.route("/questions", methods=["POST"])
+    def search_question():
         body  = request.get_json()
         search =body.get("search", None)
-        selection = Question.query.order_by(Question.id).filter(Question.question.ilike("%{}%").fomart(search))
-        current_questions =paginate_questions(request, selection)
+        if search == None:
+            abort(422)
+        try:
+            selection = Question.query.order_by(Question.id).filter(Question.question.ilike("%{}%").fomart(search))
+            current_questions =paginate_questions(request, selection)
 
-        return jsonify(
-            {
-                "success":True,
-                "books":current_questions,
-                "total_questions":len(selection.all()),
-            }
-        )
-    """
+            return jsonify(
+                {
+                    "success":True,
+                    "questions":current_questions,
+                    "total_questions":len(selection.all()),
+                }
+                         )
+
+        except:
+            abort(404)
+    
 
 
     """
@@ -199,6 +207,28 @@ def create_app(test_config=None):
     categories in the left column will cause only questions of that
     category to be shown.
     """
+
+    @app.route("/categories/<int:category_id>/questions", methods=['GET'])
+
+    def get_question_by_category(category_id):
+
+       
+        
+        try:
+            selection = Question.query.filter(Question.id == str(category_id)).all()
+            current_questions = paginate_questions(request, selection)
+
+            return jsonify({
+                "success":True,
+                "questions":current_questions,
+                "total_questions":len(selection),
+                "current_category":category_id
+
+            })
+
+
+        except:
+            abort(404)
 
     """
     @TODO:
@@ -211,6 +241,41 @@ def create_app(test_config=None):
     one question at a time is displayed, the user is allowed to answer
     and shown whether they were correct or not.
     """
+    @app.route('/quizzes', methods=['POST'])
+    def play_quiz():
+        body = request.get_json()
+
+        previous_quiz = body.get(previous_quiz)
+
+        category = body.get('quiz_category')
+
+
+        if (category['id'] == 0):
+            questions = Question.query.all()
+
+
+        else:
+            questions = Question.query.filter_by(category=category['id']).all()
+
+
+        def get_random_question():
+            return questions[random.randrange(0, len(questions), -1)]
+
+        upcoming_question = get_random_question
+
+        used = True
+
+
+        while used:
+            if upcoming_question.id in previous_quiz:
+                upcoming_question = get_random_question
+            else:
+                used = False
+
+                return jsonify({
+                    "success": True,
+                    "question":upcoming_question.format()
+                })
 
     """
     @TODO:
