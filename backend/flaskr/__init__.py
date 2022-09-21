@@ -264,8 +264,6 @@ def create_app(test_config=None):
         upcoming_question = get_random_question
 
         used = True
-
-
         while used:
             if upcoming_question.id in previous_quiz:
                 upcoming_question = get_random_question
@@ -282,6 +280,12 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     """
+
+
+    
+
+
+
 
     return app
 
