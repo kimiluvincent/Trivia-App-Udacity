@@ -54,13 +54,13 @@ def create_app(test_config=None):
     @app.route("/categories")
     def retrieve_categories():
         category = Category.query.all()
-        categorigies = [question.format() for question in category ]
+        categories = [question.format() for question in category ]
         
 
         return jsonify(
             {
                 "success":True,
-                "list_categories":categorigies,
+                "list_categories":categories,
                 "total_categories":len(Category.query.all()),
             }
         )
@@ -82,6 +82,8 @@ def create_app(test_config=None):
     def retrieve_questions():
         selection = Question.query.all()
         current_questions = paginate_questions(request,selection)
+        if current_questions == 0:
+            abort(404)
         return jsonify(
             {
                 "success":True,
@@ -102,14 +104,14 @@ def create_app(test_config=None):
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
         try:
-            question = Question.query.all(Question.id==question_id).one_or_none()
+            question = Question.query.filter(Question.id==question_id).one_or_none()
             
             if question is None:
                 abort(404)
             
             question.delete()
 
-            selection = Question.query.order_by(Question.id).all()
+            selection = Question.query.all()
             current_questions =paginate_questions(request, selection)
 
             return jsonify(
@@ -155,7 +157,7 @@ def create_app(test_config=None):
                 {
                     "success":True,
                     "created":Question.id,
-                    "books":current_questions,
+                    "questions":current_questions,
                     "Total_questions":len(Question.query.all()),
 
                 }
@@ -181,7 +183,7 @@ def create_app(test_config=None):
         body  = request.get_json()
         search =body.get("search", None)
         if search == None:
-            abort(422)
+            abort(400)
         try:
             selection = Question.query.order_by(Question.id).filter(Question.question.ilike("%{}%").fomart(search))
             current_questions =paginate_questions(request, selection)
@@ -211,7 +213,10 @@ def create_app(test_config=None):
     @app.route("/categories/<int:category_id>/questions", methods=['GET'])
 
     def get_question_by_category(category_id):
-
+        category = Category.query.filter(Category.id == category_id).one_or_none()
+        
+        if (category is None):
+            abort(400)
        
         
         try:
@@ -228,7 +233,7 @@ def create_app(test_config=None):
 
 
         except:
-            abort(404)
+            abort(422)
 
     """
     @TODO:
@@ -280,9 +285,32 @@ def create_app(test_config=None):
     Create error handlers for all expected errors
     including 404 and 422.
     """
+    @app.errorhandler(404)
+    def not_found(error):
+        return (jsonify({
+                         "success":False,
+                         "error":404,
+                         "message":"resource not found"
+                         }), 404)
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return (jsonify ({
+                    "success":False,
+                    "error":422,
+                    "message": "unprocessable"
+                }), 422)
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return(jsonify({
+                    "success":False,
+                    "error":400,
+                    "message":"Bad Request"
+                }), 400)
 
 
-    
+
 
 
 
