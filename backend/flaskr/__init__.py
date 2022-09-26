@@ -141,14 +141,14 @@ def create_app(test_config=None):
     def create_question():
         body = request.get_json()
 
-        new_question = body.get("question",None)
-        new_answer = body.get("answer", None)
-        new_category = body.get("new_category", None)
-        new_difficulty = body.get("new_difficulty", None)
+        question = body.get("question",None)
+        answer = body.get("answer", None)
+        category = body.get("category", None)
+        difficulty = body.get("difficulty", None)
 
         try:
-            question = Question(question=new_question, answer=new_answer, category=new_category,
-            difficult = new_difficulty)
+            question = Question(question=question, answer=answer, category=category,
+            difficult = difficulty)
             question.insert()
             selection = Question.query.order_by(Question.id).all()
             current_questions =paginate_questions(request, selection)
