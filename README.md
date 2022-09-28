@@ -387,4 +387,4 @@ THe API will return three errors when the request fails
 Yours Truly, Vincent Kimilu
 
 ## Acknowledgements
-The awesome team from udacicty and all my mentors from ALX.
+The awesome team from udacicty and all my mentors from ALX. Thanks You All
