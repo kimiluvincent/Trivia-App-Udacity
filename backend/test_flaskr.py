@@ -59,19 +59,21 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['total_categories']))
 
     def test_search_questions_results(self):
-        res = self.client().post('/questions', json={"search": "discovered"})
+        res = self.client().post('/questions', json={"search": "Tom Cruise"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['questons'])
+        self.assertTrue(len(data["Questions"]))
+        self.assertTrue(data["total_questions"])
+        
 
     def test_search_without_results(self):
-            res = self.client().post('/questions', json={"search":"nonsense"})
-            data = json.loads(res.data)
-            self.assertEqual(res.status_code, 422)
-            self.assertEqual(data["success"], False)
-            self.assertEqual(data["message"], "unprocessable")
+        res = self.client().post('/questions', json={"search_term":"nonsense"})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["message"], 'unprocessable')
 
     def test_delete_question_results(self):
         res = self.client().delete('/questions/20')
@@ -87,7 +89,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], "unprocessable")
+        self.assertEqual(data['message'], 'unprocessable')
 
      
         
@@ -97,7 +99,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data[''])
+        self.assertEqual(data['message'], 'Question created successfull')
         
 
     def test_create_fail_question_results(self):
